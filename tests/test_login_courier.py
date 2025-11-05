@@ -4,6 +4,7 @@ import pytest
 from api.courier import CourierAPI
 from core.utils import generate_random_string
 from data.courier import CourierTestData
+from data.expected import CourierExpected
 
 
 @allure.suite("Авторизация курьера")
@@ -29,6 +30,7 @@ class TestLoginCourier:
         })
 
         assert response.status_code == 400, f"Ожидается 400, получен {response.status_code}"
+        assert response.json().get("message") == CourierExpected.LOGIN_MISSING_FIELDS, response.json()
 
     @allure.title("Авторизация несуществующего пользователя")
     def test_login_with_nonexistent_user_error(self):
@@ -37,6 +39,7 @@ class TestLoginCourier:
         response = courier.login({"login": generate_random_string(12), "password": generate_random_string(12)})
 
         assert response.status_code == 404, f"Ожидается 404, получен {response.status_code}"
+        assert response.json().get("message") == CourierExpected.NOT_FOUND, response.json()
 
     @allure.title("Авторизация с неверным логином")
     def test_login_courier_invalid_login_error(self, courier_credentials):
@@ -45,6 +48,7 @@ class TestLoginCourier:
         response = courier.login({"login": generate_random_string(12), "password": courier_credentials[1]})
 
         assert response.status_code == 404, f"Ожидается 404, получен {response.status_code}"
+        assert response.json().get("message") == CourierExpected.NOT_FOUND, response.json()
 
     @allure.title("Авторизация с неверным паролем")
     def test_login_courier_invalid_password_error(self, courier_credentials):
@@ -53,3 +57,4 @@ class TestLoginCourier:
         response = courier.login({"login": courier_credentials[0], "password": generate_random_string(12)})
 
         assert response.status_code == 404, f"Ожидается 404, получен {response.status_code}"
+        assert response.json().get("message") == CourierExpected.NOT_FOUND, response.json()

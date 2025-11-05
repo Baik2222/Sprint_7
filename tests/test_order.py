@@ -19,8 +19,6 @@ class TestOrder:
         track_num = response.json().get("track")
         assert track_num is not None, f"Ожидается поле track в ответе"
 
-        order.cancel(track_num)
-
     @allure.title("Получение списка заказов")
     def test_get_orders_list(self):
         order = OrderAPI()
